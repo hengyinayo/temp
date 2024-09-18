@@ -1,0 +1,28 @@
+version: '3'
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    ports:
+      - "8100:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      TZ: Asia/Seoul
+    volumes:
+      - ./db/mysql/data:/var/lib/mysql
+      - ./db/mysql/init:/docker-entrypoint-initdb.d
+    platform: linux/x86_64
+
+  spring-boot-app:
+    image: heng0813/ybigta-backend:latest   # Docker Hub에 푸시된 Spring Boot 이미지
+    container_name: spring-boot-app
+    ports:
+      - "8080:8080" # Spring Boot 애플리케이션 포트
+    depends_on:
+      - db # MySQL 서비스가 먼저 실행되도록 의존성 설정
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/ # MySQL 데이터베이스 연결 설정
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
